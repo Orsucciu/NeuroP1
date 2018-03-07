@@ -1,7 +1,7 @@
 from lib.Connexion import Connexion
 from lib.Cell import Cell
 from lib.Capa import Capa
-
+import pickle # will later be used to save and load the network
 
 class Red:
 
@@ -46,10 +46,16 @@ class Red:
         origin.connexionsOut.append(connexion)
         destination.connexionsIn.append(connexion)
 
+    def setAllThresholdTo(self, value):
+        #this is a function to change the threshold of all the cells at once
+        for capa in self.capas:
+            for cell in capa.cells:
+                cell.threshold = value
+
     def toString(self):
         # this will display the network in line (not as good as an image tho)
         for capa in self.capas:
-            final = str(capa.name) + "[ " 
+            final = str(capa.name) + "[ "
             for cell in capa.cells:
                 final += " " + str(cell.name)
             final += " ]\n"
