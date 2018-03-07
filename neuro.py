@@ -5,3 +5,5 @@ rede.initCapas([2, 3, 3, 2])
 rede.connectOneToAll(2)
 rede.toString()
 
+rede.generateGraph("test")
+

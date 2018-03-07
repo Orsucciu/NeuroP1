@@ -1,7 +1,12 @@
+from __future__ import print_function
+
 from lib.Connexion import Connexion
 from lib.Cell import Cell
 from lib.Capa import Capa
-import pickle # will later be used to save and load the network
+import pickle  # will later be used to save and load the network
+import os, sys
+from PIL import Image, ImageDraw, ImageFont
+
 
 class Red:
 
@@ -16,14 +21,14 @@ class Red:
             self.capas.append(Capa(index + 1, capas[index]))
 
     def connectOneToAll(self, weight):
-        # this create a create a connexion from each cell from each layer to each cell from the next layer (except the last layer of course
+        # this create a create a connexion from each cell from each layer to each cell from the next layer
+        # (except the last layer of course)
         # the weight will be the same everywhere
 
         for capa in range(0, len(self.capas) - 1):
             for cell in self.capas[capa].cells:
                 for cell2 in self.capas[(capa + 1)].cells:
                     self.createConnexion(cell, cell2, weight)
-
 
     # def addConnexionOut(self, destination):
     #     # add a connnexion from the cell to another one
@@ -40,14 +45,14 @@ class Red:
     #     origin.connexionsOut.append(Connexion(self, origin, 1))
 
     def createConnexion(self, origin, destination, peso):
-        #create a connexion from a cell to another, and sets the weight of said connexion
+        # create a connexion from a cell to another, and sets the weight of said connexion
         connexion = Connexion(origin, destination, peso)
 
         origin.connexionsOut.append(connexion)
         destination.connexionsIn.append(connexion)
 
     def setAllThresholdTo(self, value):
-        #this is a function to change the threshold of all the cells at once
+        # this is a function to change the threshold of all the cells at once
         for capa in self.capas:
             for cell in capa.cells:
                 cell.threshold = value
@@ -60,3 +65,18 @@ class Red:
                 final += " " + str(cell.name)
             final += " ]\n"
             print(final)
+
+    def generateGraph(self, fileName):
+        im = Image.new('RGB', (500, 500), "white")
+        draw = ImageDraw.Draw(im)
+
+        x = 20
+        y = 20
+        for capa in self.capas:
+            draw.rectangle(((x, y), (x + 80, y + 30)), None, "black")
+            draw.text((x + 5, y + 5), capa.name, fill="black", font=ImageFont.truetype("arial", 18))
+            x = x + 100
+
+        del draw
+        # write to stdout
+        im.save(str(fileName) + ".png")
