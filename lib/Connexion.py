@@ -1,6 +1,8 @@
 class Connexion:
 
     def __init__(self, origin, destination, weight):
+        #constructor for a connexion
+
         self.origin = origin
         self.destination = destination
         self.weight = weight

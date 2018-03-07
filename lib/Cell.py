@@ -4,20 +4,23 @@ class Cell:
     cellCount = 0
 
     def __init__(self, capaId):
+        #Neurons constructor
 
-        self.name = "cell" + str(Cell.cellCount)
-        self.connexionsIn = []  # todo : connexions In and Connexions out
+        self.name = "cell" + str(Cell.cellCount) + "->Capa" + str(capaId)
+        self.connexionsIn = []
         self.connexionsOut = []
         self.salida = 0
         self.threshold = 0.2
         #self.state = 0
 
-        Cell.cellCount = 1 + (capaId * 10)
+        Cell.cellCount += 1
+        #Cell.cellCount = 1 + (capaId * 10)
 
     def updateSalida(self, value):
         self.salida += value
 
     def toString(self):
+        #prints out info about the neuron
         print("Cell " + self.name)
         for connexion in self.connexionsOut:
             print("To " + connexion.destination.name + " Weight : " + str(connexion.weight))

@@ -14,9 +14,9 @@ class Capa:
 
     def __init__(self, id, cellNumber):
         #init with an id and the number of cells
-        self.name = id
+        self.name = "capa" + str(id)
         self.numCells = cellNumber
-        self.cells[cellNumber]
+        self.cells = [None] * cellNumber #this initiate an array full of nulls
 
         for i in range(0, cellNumber):
             self.cells[i] = Cell(id)
