@@ -66,42 +66,55 @@ class Red:
             final += " ]\n"
             print(final)
 
+    def getBiggestCells(self):
+        # this is only useful for the graph drawing
+        # it returns the numbers of cells from the biggest layer
+        biggest = 0
+        for capa in self.capas:
+            if(len(capa.cells) > biggest):
+                biggest = len(capa.cells)
+        return biggest
+
     def generateGraph(self, fileName):
         # this will generate an image representing the network at the current state
-        im = Image.new('RGB', (1000, 400), "white") # creates a white image of given size
+        im = Image.new('RGB', (len(self.capas) * 300, self.getBiggestCells() * 200), "white") # creates a white image of given size
         draw = ImageDraw.Draw(im)
 
-        x = 20
-        y = 20
+        x = 30
+        y = 30
         for capa in self.capas:
             # we first draw the capas as rectangles
-            draw.rectangle(((x, y), (x + 120, y + 30)), None, "black")
-            draw.text((x + 5, y + 5), capa.name, fill="black", font=ImageFont.truetype("arial", 18))
+            draw.rectangle(((x, y), (x + 180, y + 45)), None, "black")
+            draw.text((x + 7, y + 7), capa.name, fill="black", font=ImageFont.truetype("arial", 18))
 
             circleY = y
             for cell in capa.cells:
                 # we draw the cells as circles with their name and threshold
-                draw.ellipse(((x, circleY + 40), (x + 80, circleY + 100)), outline="black")
-                draw.text((x + 20, circleY + 45), cell.name, fill="black", font=ImageFont.truetype("arial", 18))
-                draw.text((x + 20, circleY + 65), "<" + str(cell.threshold) + ">", fill="black", font=ImageFont.truetype("arial", 18))
+                draw.ellipse(((x, circleY + 60), (x + 120, circleY + 150)), outline="black")
+                draw.text((x + 30, circleY + 68), cell.name, fill="black", font=ImageFont.truetype("arial", 18))
+                draw.text((x + 30, circleY + 98), "<" + str(cell.threshold) + ">", fill="black", font=ImageFont.truetype("arial", 18))
 
-                connexionY = circleY + 70
-
+                connexionY = circleY + 105
+                altPos = 0
                 for connexion in cell.connexionsOut:
                     # we finally draw the connexion between each cells, as lines, along with the weight
-                    textImg = Image.new('L', (1000, 400))
-                    drawT = ImageDraw.Draw(textImg)
 
-                    draw.line(((x + 70, connexionY), (x + 210, (1 + int(connexion.destination.name[-1])) * 100)), fill="black", width=1)
-                    draw.ellipse(((x + 205, (1 + int(connexion.destination.name[-1])) * 100), (x + 210, ((1 + int(connexion.destination.name[-1])) * 100) + 5)), fill="black", outline="black")
+                    draw.line(((x + 105, connexionY), (x + 315, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
+                    draw.ellipse(((x + 310, ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + 320, ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
+                    if(altPos == 0):
+                        draw.text((x + 100, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
+                                  "<w : " + str(connexion.weight) + ">", fill="black",
+                                  font=ImageFont.truetype("arial", 15))
+                        altPos = 1
+                    else:
+                        draw.text((x + 210, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
+                                  "<w : " + str(connexion.weight) + ">", fill="black",
+                                  font=ImageFont.truetype("arial", 15))
+                        altPos = 0
 
-                    drawT.text((x + 70, connexionY), str(connexion.weight), fill=255, font=ImageFont.truetype("arial", 18))
-                    final = textImg.rotate(abs((1 + int(connexion.destination.name[-1]) * 100) - connexionY), expand=1)
-                    im.paste(ImageOps.colorize(final, (0, 0, 0), (255, 255, 255)), (0, 0), final)
+                circleY = circleY + 150
 
-                circleY = circleY + 100
-
-            x = x + 200
+            x = x + 300
 
         del draw
         # write to stdout
