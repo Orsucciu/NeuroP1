@@ -20,7 +20,7 @@ class Capa:
 
         for i in range(0, cellNumber):
             self.cells[i] = Cell(id)
-
+        Cell.cellCount = 0
         Capa.capaCount += 1
 
     def addSpecificCell(self, cell):

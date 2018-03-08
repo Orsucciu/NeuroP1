@@ -6,7 +6,7 @@ class Cell:
     def __init__(self, capaId):
         #Neurons constructor
 
-        self.name = "cell" + str(Cell.cellCount) + "->Capa" + str(capaId)
+        self.name = "cell" + str(Cell.cellCount) #+ "->Capa" + str(capaId) #this is kinda useless. see later
         self.connexionsIn = []
         self.connexionsOut = []
         self.salida = 0

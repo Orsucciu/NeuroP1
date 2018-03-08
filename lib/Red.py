@@ -67,15 +67,33 @@ class Red:
             print(final)
 
     def generateGraph(self, fileName):
-        im = Image.new('RGB', (500, 500), "white")
+        # this will generate an image representing the network at the current state
+        im = Image.new('RGB', (1000, 400), "white") # creates a white image of given size
         draw = ImageDraw.Draw(im)
 
         x = 20
         y = 20
         for capa in self.capas:
-            draw.rectangle(((x, y), (x + 80, y + 30)), None, "black")
+            draw.rectangle(((x, y), (x + 90, y + 30)), None, "black")
             draw.text((x + 5, y + 5), capa.name, fill="black", font=ImageFont.truetype("arial", 18))
-            x = x + 100
+
+            circleY = y
+            for cell in capa.cells:
+                draw.ellipse(((x, circleY + 40), (x + 80, circleY + 100)), outline="black")
+                draw.text((x + 20, circleY + 45), cell.name, fill="black", font=ImageFont.truetype("arial", 18))
+                draw.text((x + 20, circleY + 65), "<" + str(cell.threshold) + ">", fill="black", font=ImageFont.truetype("arial", 18))
+
+                connexionY = circleY
+                destNum = 1
+                for connexion in cell.connexionsOut:
+                    draw.line(((x + 70, connexionY), (x + 150, destNum * 100)), fill="black", width=1)
+
+                    destNum += 1
+                    connexionY = connexionY + 80
+
+                circleY = circleY + 80
+
+            x = x + 150
 
         del draw
         # write to stdout
