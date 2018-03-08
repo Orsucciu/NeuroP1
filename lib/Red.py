@@ -5,7 +5,7 @@ from lib.Cell import Cell
 from lib.Capa import Capa
 import pickle  # will later be used to save and load the network
 import os, sys
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
 class Red:
@@ -86,11 +86,18 @@ class Red:
                 draw.text((x + 20, circleY + 65), "<" + str(cell.threshold) + ">", fill="black", font=ImageFont.truetype("arial", 18))
 
                 connexionY = circleY + 70
+
                 for connexion in cell.connexionsOut:
-                    # we finalle draw the connexion between each cells, as lines
-                    # draw.text((x + 20, circleY + 65), "<To : " + str(connexion.destination.name) + " Weight : " + str(connexion.weight) + ">", fill="black", font=ImageFont.truetype("arial", 10))
+                    # we finally draw the connexion between each cells, as lines, along with the weight
+                    textImg = Image.new('L', (1000, 400))
+                    drawT = ImageDraw.Draw(textImg)
+
                     draw.line(((x + 70, connexionY), (x + 210, (1 + int(connexion.destination.name[-1])) * 100)), fill="black", width=1)
-                    draw.ellipse(((x + 205, (1 + int(connexion.destination.name[-1])) * 100), (x + 210, ((1 + int(connexion.destination.name[-1])) * 100)) + 5), fill="black", outline="black")
+                    draw.ellipse(((x + 205, (1 + int(connexion.destination.name[-1])) * 100), (x + 210, ((1 + int(connexion.destination.name[-1])) * 100) + 5)), fill="black", outline="black")
+
+                    drawT.text((x + 70, connexionY), str(connexion.weight), fill=255, font=ImageFont.truetype("arial", 18))
+                    final = textImg.rotate(abs((1 + int(connexion.destination.name[-1]) * 100) - connexionY), expand=1)
+                    im.paste(ImageOps.colorize(final, (0, 0, 0), (255, 255, 255)), (0, 0), final)
 
                 circleY = circleY + 100
 
