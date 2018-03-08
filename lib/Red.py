@@ -74,26 +74,27 @@ class Red:
         x = 20
         y = 20
         for capa in self.capas:
-            draw.rectangle(((x, y), (x + 90, y + 30)), None, "black")
+            # we first draw the capas as rectangles
+            draw.rectangle(((x, y), (x + 120, y + 30)), None, "black")
             draw.text((x + 5, y + 5), capa.name, fill="black", font=ImageFont.truetype("arial", 18))
 
             circleY = y
             for cell in capa.cells:
+                # we draw the cells as circles with their name and threshold
                 draw.ellipse(((x, circleY + 40), (x + 80, circleY + 100)), outline="black")
                 draw.text((x + 20, circleY + 45), cell.name, fill="black", font=ImageFont.truetype("arial", 18))
                 draw.text((x + 20, circleY + 65), "<" + str(cell.threshold) + ">", fill="black", font=ImageFont.truetype("arial", 18))
 
-                connexionY = circleY
-                destNum = 1
+                connexionY = circleY + 70
                 for connexion in cell.connexionsOut:
-                    draw.line(((x + 70, connexionY), (x + 150, destNum * 100)), fill="black", width=1)
+                    # we finalle draw the connexion between each cells, as lines
+                    # draw.text((x + 20, circleY + 65), "<To : " + str(connexion.destination.name) + " Weight : " + str(connexion.weight) + ">", fill="black", font=ImageFont.truetype("arial", 10))
+                    draw.line(((x + 70, connexionY), (x + 210, (1 + int(connexion.destination.name[-1])) * 100)), fill="black", width=1)
+                    draw.ellipse(((x + 205, (1 + int(connexion.destination.name[-1])) * 100), (x + 210, ((1 + int(connexion.destination.name[-1])) * 100)) + 5), fill="black", outline="black")
 
-                    destNum += 1
-                    connexionY = connexionY + 80
+                circleY = circleY + 100
 
-                circleY = circleY + 80
-
-            x = x + 150
+            x = x + 200
 
         del draw
         # write to stdout
