@@ -28,28 +28,23 @@ class Red:
         for capa in range(0, len(self.capas) - 1):
             for cell in self.capas[capa].cells:
                 for cell2 in self.capas[(capa + 1)].cells:
-                    self.createConnexion(cell, cell2, weight)
+                    self.cr(cell, cell2, weight)
 
-    # def addConnexionOut(self, destination):
-    #     # add a connnexion from the cell to another one
-    #     # take a cell as param (the destination)
-    #     self.connexionsOut.append(Connexion(self, destination, 1))
-    #     # destination.addConexionIn(self)
-    #     destination.connexionsIn.append(Connexion(self, destination, 1))
-    #
-    # def addConnexionIn(self, origin):
-    #     # add a connexion from another cell to this one
-    #     # take a cell as param (the origin)
-    #     self.connexionsIn.append(Connexion(origin, self, 1))
-    #     # origin.addConnexionOut(self)
-    #     origin.connexionsOut.append(Connexion(self, origin, 1))
+    def cr(self, cellOrigin, cellDestination, weight):
+        # not destined to be used by human
+        # made for connecToAll
+        # this create a connexion between two given cells
+        connexion = Connexion(cellOrigin, cellDestination, weight)
+        cellOrigin.connexionsOut.append(connexion)
+        cellDestination.connexionsIn.append(connexion)
 
     def createConnexion(self, origin, destination, peso):
         # create a connexion from a cell to another, and sets the weight of said connexion
-        connexion = Connexion(origin, destination, peso)
+        # this is for a given network, so origin is an array [int, int] with [capa num, cell num], and same for destination.
+        connexion = Connexion(self.capas[origin[0]].cells[origin[1]], self.capas[destination[0]].cells[destination[1]], peso)
 
-        origin.connexionsOut.append(connexion)
-        destination.connexionsIn.append(connexion)
+        self.capas[origin[0]].cells[origin[1]].connexionsOut.append(connexion)
+        self.capas[destination[0]].cells[destination[1]].connexionsIn.append(connexion)
 
     def setAllThresholdTo(self, value):
         # this is a function to change the threshold of all the cells at once
@@ -66,6 +61,12 @@ class Red:
             final += " ]\n"
             print(final)
 
+    ####
+    #
+    # The following is ONLY about graph making
+    #
+    ####
+
     def getBiggestCells(self):
         # this is only useful for the graph drawing
         # it returns the numbers of cells from the biggest layer
@@ -75,7 +76,17 @@ class Red:
                 biggest = len(capa.cells)
         return biggest
 
-    def generateGraph(self, fileName):
+    def getCellColumn(self, cell):
+        # util for the graph making, used when drawing line between cells
+        # returns an int representing the cell's capa number (and thus how far the drawn line must go)
+        for num in range(0, len(self.capas)):
+            for Ccell in self.capas[num].cells:
+                if cell is Ccell:
+                    return num
+
+    def generateGraph(self, fileName=None):
+        if(fileName == None):
+            fileName = self.name
         # this will generate an image representing the network at the current state
         im = Image.new('RGB', (len(self.capas) * 300, self.getBiggestCells() * 200), "white") # creates a white image of given size
         draw = ImageDraw.Draw(im)
@@ -99,9 +110,20 @@ class Red:
                 for connexion in cell.connexionsOut:
                     # we finally draw the connexion between each cells, as lines, along with the weight
 
-                    draw.line(((x + 105, connexionY), (x + 315, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
-                    draw.ellipse(((x + 310, ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + 320, ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
-                    if(altPos == 0):
+                    # for the line drawing logic, we have a problem to draw a vertical one so we need this
+                    if self.getCellColumn(connexion.origin) == self.getCellColumn(connexion.destination):
+
+                        draw.line(((x + 105, connexionY), (90 + x,
+                                                           (1 + int(connexion.destination.name[-1])) * 150)),
+                                  fill='black', width=1)
+                        draw.ellipse(((x + 90, (1 + int(connexion.destination.name[-1]) * 150) - 5), (x + 100, (1 + int(connexion.destination.name[-1]) * 150) + 10)), fill='black', outline='black')
+
+                    else:
+                        draw.line(((x + 105, connexionY), ((self.getCellColumn(connexion.destination)) * 315 + x, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
+                        draw.ellipse(((x + (self.getCellColumn(connexion.destination) * 310), ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + (self.getCellColumn(connexion.destination) * 320), ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
+
+                    # this will be to alternate the label left/right (pretty)
+                    if altPos == 0:
                         draw.text((x + 100, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
                                   "<w : " + str(connexion.weight) + ">", fill="black",
                                   font=ImageFont.truetype("arial", 15))

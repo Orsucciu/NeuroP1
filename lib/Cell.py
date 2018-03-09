@@ -9,8 +9,7 @@ class Cell:
         self.name = "cell" + str(Cell.cellCount) #+ "->Capa" + str(capaId) #this is kinda useless. see later
         self.connexionsIn = []
         self.connexionsOut = []
-        self.salida = 0
-        self.threshold = 0.2
+        self.threshold = None
         #self.state = 0
 
         Cell.cellCount += 1
@@ -45,9 +44,3 @@ class Cell:
             self.salida = -1
         else:
             self.salida = 0
-
-'''
-    def init_Connexion(self):
-        for connexion in self.connexionsOut:
-            connexion.value = self.cell_Out() * connexion.weight
-'''
