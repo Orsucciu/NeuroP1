@@ -61,6 +61,25 @@ class Red:
             final += " ]\n"
             print(final)
 
+    def activateMcCP(self, value):
+        # [value] is, an array representing the neurons from first layer to trigger.
+
+        for i in range(0, len(self.capas[0].cells)):
+            self.capas[0].cells[i].state = value[i]
+
+        for i in range(1, len(self.capas)):
+            for cell in self.capas[i].cells:
+                total_in = 0
+                for connexion in cell.connexionsIn:
+                    if connexion.origin.state == 1:
+                        total_in += connexion.weight
+
+                if total_in > cell.threshold:
+                    cell.state = 1
+
+        for i in range(0, len(self.capas[len(self.capas) - 1].cells)):
+            print(str(self.capas[len(self.capas) - 1].cells[i].state))
+
     ####
     #
     # The following is ONLY about graph making
@@ -85,6 +104,8 @@ class Red:
                     return num
 
     def generateGraph(self, fileName=None):
+        # BUGGY AS HELL
+        # Doing this kind of thing without any library is kinda diffcult
         if(fileName == None):
             fileName = self.name
         # this will generate an image representing the network at the current state
@@ -114,25 +135,25 @@ class Red:
                     if self.getCellColumn(connexion.origin) == self.getCellColumn(connexion.destination):
 
                         draw.line(((x + 105, connexionY), (90 + x,
-                                                           (1 + int(connexion.destination.name[-1])) * 150)),
+                                                           (1 + abs(int(connexion.destination.name[-1]) - int(connexion.origin.name[-1])) * 150))),
                                   fill='black', width=1)
-                        draw.ellipse(((x + 90, (1 + int(connexion.destination.name[-1]) * 150) - 5), (x + 100, (1 + int(connexion.destination.name[-1]) * 150) + 10)), fill='black', outline='black')
+                        draw.ellipse(((x + 80, (1 + abs(int(connexion.destination.name[-1]) - int(connexion.origin.name[-1])) * 70)), (x + 90, (1 + int(connexion.destination.name[-1]) * 70) + 10)), fill='black', outline='black')
 
                     else:
                         draw.line(((x + 105, connexionY), ((self.getCellColumn(connexion.destination)) * 315 + x, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
                         draw.ellipse(((x + (self.getCellColumn(connexion.destination) * 310), ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + (self.getCellColumn(connexion.destination) * 320), ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
 
                     # this will be to alternate the label left/right (pretty)
-                    if altPos == 0:
-                        draw.text((x + 100, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
-                                  "<w : " + str(connexion.weight) + ">", fill="black",
-                                  font=ImageFont.truetype("arial", 15))
-                        altPos = 1
-                    else:
-                        draw.text((x + 210, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
-                                  "<w : " + str(connexion.weight) + ">", fill="black",
-                                  font=ImageFont.truetype("arial", 15))
-                        altPos = 0
+                    # if altPos == 0:
+                    #     draw.text((x + 100, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
+                    #               "<w : " + str(connexion.weight) + ">", fill="black",
+                    #               font=ImageFont.truetype("arial", 15))
+                    #     altPos = 1
+                    # else:
+                    #     draw.text((x + 210, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
+                    #               "<w : " + str(connexion.weight) + ">", fill="black",
+                    #               font=ImageFont.truetype("arial", 15))
+                    #     altPos = 0
 
                 circleY = circleY + 150
 

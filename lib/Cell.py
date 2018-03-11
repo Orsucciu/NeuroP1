@@ -10,13 +10,10 @@ class Cell:
         self.connexionsIn = []
         self.connexionsOut = []
         self.threshold = None
-        #self.state = 0
+        self.state = 0  # this represent the "out" of cell, in the sense is it activated, what is it outputing
 
         Cell.cellCount += 1
         #Cell.cellCount = 1 + (capaId * 10)
-
-    def updateSalida(self, value):
-        self.salida += value
 
     def toString(self):
         #prints out info about the neuron
@@ -26,21 +23,25 @@ class Cell:
         for connexion in self.connexionsIn:
             print("From " + connexion.destination.name + " Weight : " + str(connexion.weight))
 
-    def cell_In(self):
+    def cell_InmcCP(self):
+        # gets the sum of values "in" (c
         suma_In = 0
         for connexion in self.connexionsIn:
-            if (connexion.destination == self):
-                suma_In += connexion.value
-                connexion.resetValue()
+            if (connexion.destination is self):
+                suma_In += connexion.weight * connexion.origin.state
         return suma_In
 
-    def cell_fdt(self):
+    def fdt_mcCP(self):
         #function de transferencia por mccullochs pitts
         #sets the cell value
-        result = self.cell_In()
+        result = self.cell_InmcCP()
         if (result > self.threshold):
             self.salida = 1
         elif (result < self.threshold):
-            self.salida = -1
+            self.salida = 0
         else:
             self.salida = 0
+
+    def activate_mcCP(self):
+        # used for the entry layer; simply set salida to 1
+        self.salida = 1

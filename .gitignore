@@ -5,3 +5,5 @@
 *.pyc
 *.pyc
 lib/__pycache__/Cell.cpython-36.pyc
+*.pyc
+*.pyc
