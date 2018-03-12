@@ -1,7 +1,7 @@
 from lib.Connexion import Connexion
 
 class Cell:
-    cellCount = 0
+    cellCount = 1
 
     def __init__(self, capaId):
         #Neurons constructor

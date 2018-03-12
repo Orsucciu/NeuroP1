@@ -169,8 +169,8 @@ class Red:
                         draw.ellipse(((x + 80, (1 + abs(int(connexion.destination.name[-1]) - int(connexion.origin.name[-1])) * 70)), (x + 90, (1 + int(connexion.destination.name[-1]) * 70) + 10)), fill='black', outline='black')
 
                     else:
-                        draw.line(((x + 105, connexionY), ((self.getCellColumn(connexion.destination)) * 315 + x, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
-                        draw.ellipse(((x + (self.getCellColumn(connexion.destination) * 310), ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + (self.getCellColumn(connexion.destination) * 320), ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
+                        draw.line(((x + 105, connexionY), ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 315 + x, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
+                        draw.ellipse(((x + ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 310), ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 320), ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
 
                     # this will be to alternate the label left/right (pretty)
                     # if altPos == 0:

@@ -33,7 +33,7 @@ retu.createConnexion([2, 2], [3, 0], 2)
 retu.createConnexion([2, 3], [3, 1], 2)
 retu.createConnexion([2, 4], [3, 1], 2)
 retu.createConnexion([2, 5], [3, 1], 2)
-
+retu.generateGraph()
 
 a = []
 file = open(sys.argv[1], "r")

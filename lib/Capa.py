@@ -1,8 +1,8 @@
 from lib.Cell import Cell
 
 class Capa:
-    cellCount = 0
-    capaCount = 0
+    cellCount = 1
+    capaCount = 1
 
     def __init__(self):
         #init without params
