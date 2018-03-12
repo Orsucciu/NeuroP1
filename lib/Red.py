@@ -172,18 +172,6 @@ class Red:
                         draw.line(((x + 105, connexionY), ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 315 + x, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
                         draw.ellipse(((x + ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 310), ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 320), ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
 
-                    # this will be to alternate the label left/right (pretty)
-                    # if altPos == 0:
-                    #     draw.text((x + 100, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
-                    #               "<w : " + str(connexion.weight) + ">", fill="black",
-                    #               font=ImageFont.truetype("arial", 15))
-                    #     altPos = 1
-                    # else:
-                    #     draw.text((x + 210, ((1 + int(connexion.destination.name[-1])) * 150) - 20),
-                    #               "<w : " + str(connexion.weight) + ">", fill="black",
-                    #               font=ImageFont.truetype("arial", 15))
-                    #     altPos = 0
-
                 circleY = circleY + 150
 
             x = x + 300
