@@ -1,4 +1,5 @@
 from lib.Red import Red
+import sys
 
 # redeTemp = Red("temperature")
 # redeTemp.initCapas([2, 2, 2])
@@ -48,7 +49,18 @@ retu.createConnexion([2, 3], [3, 1], 2)
 retu.createConnexion([2, 4], [3, 1], 2)
 retu.createConnexion([2, 5], [3, 1], 2)
 
-retu.generateGraph()
-a = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-for i in range(0, len(a)):
-    retu.activateMcCP(a[i])
+
+a = []
+file = open(sys.argv[1], "r")
+line = file.readline()
+while line:
+    temp = []
+    for i in range(0, 2):
+        temp.append(line[i])
+
+    a.append(line)
+    line = file.readline()
+file.close()
+
+retu.resetStates()
+retu.activateMcCP(a, sys.argv[2])

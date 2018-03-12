@@ -61,24 +61,53 @@ class Red:
             final += " ]\n"
             print(final)
 
-    def activateMcCP(self, value):
+    def resetStates(self):
+        # reset all states to 0
+        for capa in self.capas:
+            for cell in capa.cells:
+                cell.state = 0
+
+    def activeCells(self):
+        # return all cells with state = 1
+        for capa in self.capas:
+            for cell in capa.cells:
+                if cell.state == 1:
+                    print(capa.name + " " + cell.name)
+
+    def activateMcCP(self, values, outname):
         # [value] is, an array representing the neurons from first layer to trigger.
+        # this function is kinda specific, because we needed to retain the second layers values
+        result = ""
+        for value in values:
 
-        for i in range(0, len(self.capas[0].cells)):
-            self.capas[0].cells[i].state = value[i]
+            for i in range(0, len(self.capas[1].cells)):
+                self.capas[1].cells[i].state = self.capas[0].cells[i].state
 
-        for i in range(1, len(self.capas)):
-            for cell in self.capas[i].cells:
-                total_in = 0
-                for connexion in cell.connexionsIn:
-                    if connexion.origin.state == 1:
-                        total_in += connexion.weight
+            for i in range(0, len(self.capas[0].cells)):
+                # init first layer
+                self.capas[0].cells[i].state = value[i]
 
-                if total_in > cell.threshold:
-                    cell.state = 1
+            for i in range(2, len(self.capas)):
+                # main loop filling other layers
+                for cell in self.capas[i].cells:
+                    total_in = 0
+                    for connexion in cell.connexionsIn:
+                        if connexion.origin.state == 1:
+                            total_in += connexion.weight * connexion.origin.state
 
-        for i in range(0, len(self.capas[len(self.capas) - 1].cells)):
-            print(str(self.capas[len(self.capas) - 1].cells[i].state))
+                    if total_in >= cell.threshold:
+                        cell.state = 1
+                    else:
+                        cell.state = 0
+
+            for cell in self.capas[len(self.capas) - 1].cells:
+                result += str(cell.state)
+            result += "\n"
+
+        text_file = open(outname + ".txt", "w")
+        text_file.write(result)
+        text_file.close()
+        print(result)
 
     ####
     #
