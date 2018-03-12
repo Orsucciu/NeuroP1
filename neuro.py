@@ -1,21 +1,6 @@
 from lib.Red import Red
 import sys
 
-# redeTemp = Red("temperature")
-# redeTemp.initCapas([2, 2, 2])
-# redeTemp.setAllThresholdTo(2)
-# redeTemp.createConnexion([0, 0], [2, 0], 2)
-#
-# redeTemp.createConnexion([0, 1], [1, 0], -1)
-# redeTemp.createConnexion([0, 1], [1, 1], 2)
-# redeTemp.createConnexion([0, 1], [2, 1], 1)
-#
-# redeTemp.createConnexion([1, 0], [2, 0], 2)
-#
-# redeTemp.createConnexion([1, 1], [1, 0], 2)
-# redeTemp.createConnexion([1, 1], [2, 1], 1)
-# redeTemp.generateGraph()
-
 retu = Red("UpOrDown")
 retu.initCapas([3, 3, 6, 2])
 retu.setAllThresholdTo(2)

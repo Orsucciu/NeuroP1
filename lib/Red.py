@@ -81,11 +81,11 @@ class Red:
         for value in values:
 
             for i in range(0, len(self.capas[1].cells)):
-                self.capas[1].cells[i].state = self.capas[0].cells[i].state
+                self.capas[1].cells[i].state = int(self.capas[0].cells[i].state)
 
             for i in range(0, len(self.capas[0].cells)):
                 # init first layer
-                self.capas[0].cells[i].state = value[i]
+                self.capas[0].cells[i].state = int(value[i])
 
             for i in range(2, len(self.capas)):
                 # main loop filling other layers
