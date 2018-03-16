@@ -1,16 +1,19 @@
 from lib.Connexion import Connexion
 
 class Cell:
-    cellCount = 1
+    cellCount = 0
 
-    def __init__(self, capaId):
+    def __init__(self, name=None, state=0):
         #Neurons constructor
 
-        self.name = "cell" + str(Cell.cellCount) #+ "->Capa" + str(capaId) #this is kinda useless. see later
+        if(name != None):
+            self.name = name
+        else:
+            self.name = "cell" + str(Cell.cellCount) #+ "->Capa" + str(capaId) #this is kinda useless. see later
         self.connexionsIn = []
         self.connexionsOut = []
-        self.threshold = None
-        self.state = 0  # this represent the "out" of cell, in the sense is it activated, what is it outputing
+        self.threshold = 0
+        self.state = state  # this represent the "out" of cell, in the sense is it activated, what is it outputing
 
         Cell.cellCount += 1
         #Cell.cellCount = 1 + (capaId * 10)

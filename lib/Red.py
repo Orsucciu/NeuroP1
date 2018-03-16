@@ -20,6 +20,10 @@ class Red:
         for index in range(0, len(capas)):
             self.capas.append(Capa(index + 1, capas[index]))
 
+    def addCell(self, capaNumber, name, state):
+        cell = Cell(name, state)
+        self.capas[capaNumber].addSpecifcCell(cell)
+
     def connectOneToAll(self, weight):
         # this create a create a connexion from each cell from each layer to each cell from the next layer
         # (except the last layer of course)
@@ -74,14 +78,198 @@ class Red:
                 if cell.state == 1:
                     print(capa.name + " " + cell.name)
 
+    def processText(self, fileName):
+        # takes a file name, and returns an array with all data needed
+        a = []
+        file = open(fileName, "r")
+        line = file.readline()
+        while line:
+            a.append(line.split())
+            line = file.readline()
+        file.close()
+
+        return a
+
+    def exploitPerceptron(self, input_data):
+        final_data = []  # this will be the data outputted by the perceptron
+        del input_data[0]  # comment this line as needed. it's needed because our data file have a useless first line
+
+        for index_values in range(0, len(input_data)):
+            for index_capa in range(0, len(self.capas) - 1):
+                # meant to represent each capas except the last one (out). not sure if this will be useful tho
+                current_capa = self.capas[index_capa]
+                y_in = 0
+                f_y = 0
+                bias = current_capa.cells[len(current_capa.cells) - 1].state
+                current_data = input_data[index_values]
+                current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+                for index_cell in range(0, len(current_capa.cells) - 1):
+                    # for each cell in the capa except the last one (it's the bias)
+                    current_cell = current_capa.cells[index_cell]
+                    # we set the activation
+                    current_cell.state = float(current_data[index_cell])
+
+                current_out = 0
+                for connexion in current_cell.connexionsOut:
+                    # we calculate the out for each cell out
+                    y_in = bias + current_cell.state * connexion.weight
+
+                    if (y_in > connexion.destination.threshold):
+                        f_y = 1
+                    elif (y_in <= connexion.destination.threshold and y_in >= (connexion.destination.threshold) * -1):
+                        f_y = 0
+                    elif (y_in <= (connexion.destination.threshold) * -1):
+                        f_y = -1
+                    connexion.destination.state = f_y
+
+                for cell in self.capas[len(self.capas) - 1].cells:
+                    print(cell.state)
+
+    def trainPerceptron(self, input_data, learning_rate):
+
+        del input_data[0]
+        epoch = 0
+        while epoch < 50:
+            # main training loop.
+            for index_values in range(0, len(input_data)):
+                for index_capa in range(0, len(self.capas) - 1):
+                    # meant to represent each capas except the last one (out). not sure if this will be useful tho
+                    current_capa = self.capas[index_capa]
+                    y_in = 0
+                    f_y = 0
+                    current_data = input_data[index_values]
+                    current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+                    for index_cell in range(0, len(current_capa.cells) - 1):
+                        # for each cell in the capa except the last one (it's the bias)
+                        # we set the activation
+                        current_capa.cells[index_cell].state = float(current_data[index_cell])
+
+                    for cell in self.capas[len(self.capas) - 1].cells:
+                        y_in += current_capa.cells[len(current_capa.cells) - 1].state
+                        for connexion in cell.connexionsIn:
+                            # we calculate the out for each cell out
+                            y_in += connexion.origin.state * connexion.weight
+
+                        if y_in > cell.threshold:
+                            f_y = 1
+                        elif cell.threshold >= y_in >= cell.threshold * -1:
+                            f_y = 0
+                        elif y_in <= cell.threshold * -1:
+                            f_y = -1
+
+                        ### i think we might have the following : each "out" cell update the precedents, and thus changes what the next "out" will get
+                        cell.state = f_y
+                        # we finally set the state of each cell out
+                        if float(cell.state) != float(current_expected_out[int(cell.name[-1])]):
+                            # is the result isn't the good one, we update the weight of the cell's connexion and the bias
+                            connexion.weight += learning_rate * int(current_expected_out[int(connexion.destination.name[-1])]) * connexion.origin.state
+                            current_capa.cells[len(current_capa.cells) - 1].state += learning_rate * int(current_expected_out[int(connexion.destination.name[-1])])
+
+            print("Epoch : " + str(epoch))
+            epoch += 1
+
+    def exploitAdaline(self, input_data):
+        del input_data[0]
+
+        for index_values in range(0, len(input_data)):
+            for index_capa in range(0, len(self.capas) - 1):
+                # meant to represent each capas except the last one (out). not sure if this will be useful tho
+                current_capa = self.capas[index_capa]
+                y_in = 0
+                f_y = 0
+                current_data = input_data[index_values]
+                current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+                for index_cell in range(0, len(current_capa.cells) - 1):
+                    # for each cell in the capa except the last one (it's the bias)
+                    # we set the activation
+                    current_capa.cells[index_cell].state = float(current_data[index_cell])
+
+                for cell in self.capas[len(self.capas) - 1].cells:
+                    y_in += current_capa.cells[len(current_capa.cells) - 1].state
+                    for connexion in cell.connexionsIn:
+                        # we calculate the out for each cell out
+                        y_in += connexion.origin.state * connexion.weight
+
+                    if y_in >= 0:
+                        f_y = 1
+                    elif y_in <= 0:
+                        f_y = -1
+
+                    ### i think we might have the following : each "out" cell update the precedents, and thus changes what the next "out" will get
+                    cell.state = f_y
+
+                    for cell in self.capas[len(self.capas) - 1].cells:
+                        print(cell.state)
+
+
+
+    def trainAdaline(self, input_data, learning_rate, tolerance):
+
+        del input_data[0]
+        epoch = 0
+        while True:
+            # main training loop.
+            highest_change = 0
+            for index_values in range(0, len(input_data)):
+                for index_capa in range(0, len(self.capas) - 1):
+                    # meant to represent each capas except the last one (out). not sure if this will be useful tho
+                    current_capa = self.capas[index_capa]
+                    y_in = 0
+                    f_y = 0
+                    current_data = input_data[index_values]
+                    current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+                    for index_cell in range(0, len(current_capa.cells) - 1):
+                        # for each cell in the capa except the last one (it's the bias)
+                        # we set the activation
+                        current_capa.cells[index_cell].state = float(current_data[index_cell])
+
+                    for cell in self.capas[len(self.capas) - 1].cells:
+                        y_in += current_capa.cells[len(current_capa.cells) - 1].state # we add the bias
+                        for connexion in cell.connexionsIn:
+                            # we calculate the out for each cell out
+                            y_in += connexion.origin.state * connexion.weight
+
+                        # transferance function
+                        if y_in >= 0:
+                            f_y = 1
+                        elif y_in <= 0:
+                            f_y = -1
+
+                        ### i think we might have the following : each "out" cell update the precedents, and thus changes what the next "out" will get
+                        cell.state = f_y
+                        # we finally set the state of each cell out
+                        if float(cell.state) != float(current_expected_out[int(cell.name[-1])]):
+                            # is the result isn't the good one, we update the weight of the cell's connexion and the bias
+                            if(((connexion.weight + learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexion.origin.state) - connexion.weight) > highest_change):
+                                highest_change = (connexion.weight + learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexion.origin.state) - connexion.weight
+                            connexion.weight += learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexion.origin.state
+                            current_capa.cells[len(current_capa.cells) - 1].state += learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in)
+
+            print("Epoch : " + str(epoch))
+            epoch += 1
+
+            if(highest_change > tolerance):
+                break
+
     def activateMcCP(self, values, outname):
         # [value] is, an array representing the neurons from first layer to trigger.
         # this function is kinda specific, because we needed to retain the second layers values
         result = ""
         for value in values:
 
-            for i in range(0, len(self.capas[1].cells)):
-                self.capas[1].cells[i].state = int(self.capas[0].cells[i].state)
+            for cell in self.capas[1].cells:
+                #we set the neurons of 2nd layer, who are copies of the first
+                # we need this because the 1st and 2nd layer must be "unsynchronized" to work as intended
+                #self.capas[1].cells[i].state = int(self.capas[0].cells[i].state)
+                total_in = 0
+                for connexion in cell.connexionsIn:
+                    if connexion.origin.state == 1:
+                        total_in += connexion.weight * connexion.origin.state
+
+                if total_in >= cell.threshold:
+                    cell.state = 1
+                else:
+                    cell.state = 0
 
             for i in range(0, len(self.capas[0].cells)):
                 # init first layer

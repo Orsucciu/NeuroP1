@@ -6,7 +6,7 @@ class Connexion:
         self.origin = origin
         self.destination = destination
         self.weight = weight
-        self.name = origin.name + " " + destination.name
+        self.name = str(origin.name) + " " + str(destination.name)
 
     def toString(self):
         print("From " + self.origin.name + " To " + self.destination.name + " Weight : " + str(

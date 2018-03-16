@@ -1,31 +1,30 @@
 from lib.Cell import Cell
 
 class Capa:
-    cellCount = 1
-    capaCount = 1
+    cellCount = 0
+    capaCount = 0
 
-    def __init__(self):
-        #init without params
-        self.name = "capa" + str(Capa.capaCount)
-        self.numCells = 0
-        self.cells = []
-
-        Capa.capaCount += 1
-
-    def __init__(self, id, cellNumber):
+    def __init__(self, id=None, cellNumber=0):
         #init with an id and the number of cells
-        self.name = "capa" + str(id)
+        if id == None:
+            self.name = "capa" + str(Capa.capaCount)
+        else:
+            self.name = "capa" + str(id)
         self.numCells = cellNumber
-        self.cells = [None] * cellNumber #this initiate an array full of nulls
+        if cellNumber != 0:
+            self.cells = [None] * cellNumber #this initiate an array full of nulls
 
-        for i in range(0, cellNumber):
-            self.cells[i] = Cell(id)
-        Cell.cellCount = 0
+            for i in range(0, cellNumber):
+                self.cells[i] = Cell(id)
+            Cell.cellCount = 0
+
+        else:
+            self.cells = []
         Capa.capaCount += 1
 
     def addSpecificCell(self, cell):
         self.cells.append(cell)
-        self.numCells +=1
+        self.numCells += 1
 
     def toString(self):
         print("Capa " + self.name)
