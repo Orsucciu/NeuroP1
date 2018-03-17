@@ -4,9 +4,9 @@ class Cell:
     cellCount = 0
 
     def __init__(self, name=None, state=0):
-        #Neurons constructor
+        # Neurons constructor
 
-        if(name != None):
+        if name is not None:
             self.name = name
         else:
             self.name = "cell" + str(Cell.cellCount) #+ "->Capa" + str(capaId) #this is kinda useless. see later
@@ -16,7 +16,6 @@ class Cell:
         self.state = state  # this represent the "out" of cell, in the sense is it activated, what is it outputing
 
         Cell.cellCount += 1
-        #Cell.cellCount = 1 + (capaId * 10)
 
     def toString(self):
         #prints out info about the neuron
