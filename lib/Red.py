@@ -95,35 +95,37 @@ class Red:
         del input_data[0]  # comment this line as needed. it's needed because our data file have a useless first line
 
         for index_values in range(0, len(input_data)):
-            for index_capa in range(0, len(self.capas) - 1):
-                # meant to represent each capas except the last one (out). not sure if this will be useful tho
-                current_capa = self.capas[index_capa]
+            # each line in the file (even if in this case, it's values inside an array)
+            current_data = input_data[index_values]
+            current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+            current_expected_out.reverse()
+            for index_cell in range(0, len(self.capas[0].cells) - 1):
+                # for each cell in the input layer (except bias ones)
+                # we set the activation
+                if "bias" not in self.capas[0].cells[index_cell].name:
+                    self.capas[0].cells[index_cell].state = float(current_data[index_cell])
+
+            for cell in self.capas[1].cells:
+                # for each cell in the output layer
                 y_in = 0
                 f_y = 0
-                bias = current_capa.cells[len(current_capa.cells) - 1].state
-                current_data = input_data[index_values]
-                current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
-                for index_cell in range(0, len(current_capa.cells) - 1):
-                    # for each cell in the capa except the last one (it's the bias)
-                    current_cell = current_capa.cells[index_cell]
-                    # we set the activation
-                    current_cell.state = float(current_data[index_cell])
+                for connexion in cell.connexionsIn:
+                    # we calculate the sum of the values in
+                    y_in += connexion.origin.state * connexion.weight
 
-                current_out = 0
-                for connexion in current_cell.connexionsOut:
-                    # we calculate the out for each cell out
-                    y_in = bias + current_cell.state * connexion.weight
+                if y_in > cell.threshold:
+                    f_y = 1
+                elif cell.threshold >= y_in >= cell.threshold * -1:
+                    f_y = 0
+                elif y_in <= cell.threshold * -1:
+                    f_y = -1
 
-                    if (y_in > connexion.destination.threshold):
-                        f_y = 1
-                    elif (y_in <= connexion.destination.threshold and y_in >= (connexion.destination.threshold) * -1):
-                        f_y = 0
-                    elif (y_in <= (connexion.destination.threshold) * -1):
-                        f_y = -1
-                    connexion.destination.state = f_y
+                cell.state = f_y  # we finally set the state of each cell out
 
-                for cell in self.capas[len(self.capas) - 1].cells:
-                    print(cell.state)
+            result = ""
+            for cell in self.capas[len(self.capas) - 1].cells:
+                result += str(cell.state) + " "
+            print(result)
 
     def trainPerceptron(self, input_data, learning_rate):
         # made for a regular perceptron, not a multilayer one
@@ -135,10 +137,9 @@ class Red:
             hasChanged = False # witness if that epoch didn't changed anything
             for index_values in range(0, len(input_data)):
                 # each line in the file (even if in this case, it's values inside an array)
-                y_in = 0
-                f_y = 0
                 current_data = input_data[index_values]
                 current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+                current_expected_out.reverse()
                 for index_cell in range(0, len(self.capas[0].cells) - 1):
                     # for each cell in the input layer (except bias ones)
                     # we set the activation
@@ -148,6 +149,7 @@ class Red:
                 for cell in self.capas[1].cells:
                     # for each cell in the output layer
                     y_in = 0
+                    f_y = 0
                     for connexion in cell.connexionsIn:
                         # we calculate the sum of the values in
                         y_in += connexion.origin.state * connexion.weight
@@ -165,11 +167,11 @@ class Red:
                         # if the result isn't the good one, we update the weight of the cell's connexions (including bias)
                         hasChanged = True
 
-                        for connexion in cell.connexionsIn:
-                            if "bias" is not connexion.origin.name:
-                                connexion.weight += learning_rate * int(current_expected_out[int(connexion.destination.name[-1])]) * connexion.origin.state
+                        for connexionToCorrect in cell.connexionsIn:
+                            if "bias" not in connexionToCorrect.origin.name:
+                                connexionToCorrect.weight += learning_rate * int(current_expected_out[int(connexionToCorrect.destination.name[-1])]) * connexionToCorrect.origin.state
                             else:
-                                connexion.weight += learning_rate * int(current_expected_out[int(connexion.destination.name[-1])])
+                                connexionToCorrect.weight += learning_rate * int(current_expected_out[int(connexionToCorrect.destination.name[-1])])
 
             print("Epoch : " + str(epoch))
             epoch += 1
@@ -367,6 +369,8 @@ class Red:
                     else:
                         draw.line(((x + 105, connexionY), ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 315 + x, (1 + int(connexion.destination.name[-1])) * 150)), fill="black", width=1)
                         draw.ellipse(((x + ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 310), ((1 + int(connexion.destination.name[-1])) * 150) - 5), (x + ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 320), ((1 + int(connexion.destination.name[-1])) * 150) + 10)), fill="black", outline="black") # this is meant to represent the destination
+                        diff = ((self.getCellColumn(connexion.destination) - self.getCellColumn(connexion.origin)) * 315 + x)/2
+                        draw.text((diff + 20, connexionY), text=str(connexion.weight), fill="black", font=ImageFont.truetype("arial", 18))
 
                 circleY = circleY + 150
 
