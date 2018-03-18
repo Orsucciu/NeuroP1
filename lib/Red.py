@@ -169,13 +169,14 @@ class Red:
 
                         for connexionToCorrect in cell.connexionsIn:
                             if "bias" not in connexionToCorrect.origin.name:
-                                connexionToCorrect.weight += learning_rate * int(current_expected_out[int(connexionToCorrect.destination.name[-1])]) * connexionToCorrect.origin.state
+                                connexionToCorrect.weight += learning_rate * float(current_expected_out[int(connexionToCorrect.destination.name[-1])]) * connexionToCorrect.origin.state
                             else:
-                                connexionToCorrect.weight += learning_rate * int(current_expected_out[int(connexionToCorrect.destination.name[-1])])
+                                connexionToCorrect.weight += learning_rate * float(current_expected_out[int(connexionToCorrect.destination.name[-1])])
 
             print("Epoch : " + str(epoch))
             epoch += 1
             if hasChanged is False:
+                print("Solution found.")
                 break
 
     def exploitAdaline(self, input_data):
@@ -245,7 +246,6 @@ class Red:
                         elif y_in <= 0:
                             f_y = -1
 
-                        ### i think we might have the following : each "out" cell update the precedents, and thus changes what the next "out" will get
                         cell.state = f_y
                         # we finally set the state of each cell out
                         if float(cell.state) != float(current_expected_out[int(cell.name[-1])]):
