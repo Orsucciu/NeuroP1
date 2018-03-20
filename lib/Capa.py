@@ -8,9 +8,9 @@ class Capa:
     def __init__(self, id=None, cellNumber=0):
         # init with an id and the number of cells
         if id == None:
-            self.name = "capa" + str(Capa.capaCount)
+            self.name = "layer" + str(Capa.capaCount)
         else:
-            self.name = "capa" + str(id)
+            self.name = "layer" + str(id)
         self.numCells = cellNumber
         if cellNumber != 0:
             self.cells = [None] * cellNumber  # this initiate an array full of nulls

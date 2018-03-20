@@ -139,7 +139,7 @@ class Red:
                 # each line in the file (even if in this case, it's values inside an array)
                 current_data = input_data[index_values]
                 current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
-                current_expected_out.reverse()
+                #current_expected_out.reverse()
                 for index_cell in range(0, len(self.capas[0].cells) - 1):
                     # for each cell in the input layer (except bias ones)
                     # we set the activation
@@ -183,34 +183,35 @@ class Red:
         del input_data[0]
 
         for index_values in range(0, len(input_data)):
-            for index_capa in range(0, len(self.capas) - 1):
-                # meant to represent each capas except the last one (out). not sure if this will be useful tho
-                current_capa = self.capas[index_capa]
+            # each line in the file (even if in this case, it's values inside an array)
+            current_data = input_data[index_values]
+            current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+            # current_expected_out.reverse()
+            for index_cell in range(0, len(self.capas[0].cells) - 1):
+                # for each cell in the input layer (except bias ones)
+                # we set the activation
+                if "bias" not in self.capas[0].cells[index_cell].name:
+                    self.capas[0].cells[index_cell].state = float(current_data[index_cell])
+
+            for cell in self.capas[1].cells:
+                # for each cell in the output layer
                 y_in = 0
                 f_y = 0
-                current_data = input_data[index_values]
-                current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
-                for index_cell in range(0, len(current_capa.cells) - 1):
-                    # for each cell in the capa except the last one (it's the bias)
-                    # we set the activation
-                    current_capa.cells[index_cell].state = float(current_data[index_cell])
-
-                for cell in self.capas[len(self.capas) - 1].cells:
-                    y_in += current_capa.cells[len(current_capa.cells) - 1].state
-                    for connexion in cell.connexionsIn:
-                        # we calculate the out for each cell out
-                        y_in += connexion.origin.state * connexion.weight
+                for connexion in cell.connexionsIn:
+                    # we calculate the sum of the values in
+                    y_in += connexion.origin.state * connexion.weight
 
                     if y_in >= 0:
                         f_y = 1
                     elif y_in <= 0:
                         f_y = -1
 
-                    ### i think we might have the following : each "out" cell update the precedents, and thus changes what the next "out" will get
                     cell.state = f_y
 
+                    result = ""
                     for cell in self.capas[len(self.capas) - 1].cells:
-                        print(cell.state)
+                        result += str(cell.state) + " "
+                    print(result)
 
 
 
@@ -222,43 +223,39 @@ class Red:
             # main training loop.
             highest_change = 0
             for index_values in range(0, len(input_data)):
-                for index_capa in range(0, len(self.capas) - 1):
-                    # meant to represent each capas except the last one (out). not sure if this will be useful tho
-                    current_capa = self.capas[index_capa]
+                # each line in the file (even if in this case, it's values inside an array)
+                current_data = input_data[index_values]
+                current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
+
+                for index_cell in range(0, len(self.capas[0].cells) - 1):
+                    # for each cell in the input layer (except bias ones)
+                    # we set the activation
+                    if "bias" not in self.capas[0].cells[index_cell].name:
+                        self.capas[0].cells[index_cell].state = float(current_data[index_cell])
+
+                for cell in self.capas[1].cells:
+                    # for each cell in the output layer
                     y_in = 0
-                    f_y = 0
-                    current_data = input_data[index_values]
-                    current_expected_out = input_data[index_values][-len(self.capas[len(self.capas) - 1].cells):]
-                    for index_cell in range(0, len(current_capa.cells) - 1):
-                        # for each cell in the capa except the last one (it's the bias)
-                        # we set the activation
-                        current_capa.cells[index_cell].state = float(current_data[index_cell])
+                    for connexion in cell.connexionsIn:
+                        # we calculate the sum of the values in
+                        y_in += connexion.origin.state * connexion.weight
 
-                    for cell in self.capas[len(self.capas) - 1].cells:
-                        y_in += current_capa.cells[len(current_capa.cells) - 1].state # we add the bias
-                        for connexion in cell.connexionsIn:
-                            # we calculate the out for each cell out
-                            y_in += connexion.origin.state * connexion.weight
+                    for connexionToCorrect in cell.connexionsIn:
+                        old = connexionToCorrect.weight
+                        if "bias" not in connexionToCorrect.origin.name:
+                            connexionToCorrect.weight += learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexionToCorrect.origin.state
 
-                        # transferance function
-                        if y_in >= 0:
-                            f_y = 1
-                        elif y_in <= 0:
-                            f_y = -1
+                        else:
+                            connexionToCorrect.weight += learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in)
 
-                        cell.state = f_y
-                        # we finally set the state of each cell out
-                        if float(cell.state) != float(current_expected_out[int(cell.name[-1])]):
-                            # is the result isn't the good one, we update the weight of the cell's connexion and the bias
-                            if(((connexion.weight + learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexion.origin.state) - connexion.weight) > highest_change):
-                                highest_change = (connexion.weight + learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexion.origin.state) - connexion.weight
-                            connexion.weight += learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in) * connexion.origin.state
-                            current_capa.cells[len(current_capa.cells) - 1].state += learning_rate * (float(current_expected_out[int(cell.name[-1])]) - y_in)
+                        if abs(old - connexionToCorrect.weight) > highest_change:
+                            highest_change = abs(old - connexionToCorrect.weight)
 
-            print("Epoch : " + str(epoch))
+            print("Epoch : " + str(epoch) + " Highest change = " + str(highest_change))
             epoch += 1
 
             if(highest_change > tolerance):
+                print("The change attained Tolerance")
                 break
 
     def activateMcCP(self, values, outname):

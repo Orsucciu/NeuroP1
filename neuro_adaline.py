@@ -8,5 +8,5 @@ retu.connectOneToAll(0)
 retu.setAllThresholdTo(0.2)
 retu.generateGraph()
 
-retu.trainAdaline(retu.processText("and.txt"), 0.1, 2)
-retu.exploitAdaline(retu.processText("and.txt"))
+retu.trainAdaline(retu.processText("one.txt"), 0.5, 0.9)
+retu.exploitAdaline(retu.processText("one.txt"))
